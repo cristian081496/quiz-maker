@@ -8,13 +8,17 @@ interface QuestionPlayerProps {
   question: Question;
   answer: string;
   onAnswerChange: (answer: string) => void;
+  onPaste?: (questionId: string) => void;
 }
 
 export default function QuestionPlayer({
   question,
   answer,
   onAnswerChange,
+  onPaste,
 }: QuestionPlayerProps) {
+  const questionId = question.id ? String(question.id) : "";
+
   return (
     <div className="border border-gray-200 rounded-lg p-6 bg-white">
       <div className="mb-6">
@@ -53,6 +57,7 @@ export default function QuestionPlayer({
             value={answer}
             onChange={(e) => onAnswerChange(e.target.value)}
             className="w-full"
+            onPaste={() => onPaste?.(questionId)}
           />
         )}
 
@@ -63,6 +68,7 @@ export default function QuestionPlayer({
             onChange={(e) => onAnswerChange(e.target.value)}
             rows={10}
             className="font-mono text-sm"
+            onPaste={() => onPaste?.(questionId)}
           />
         )}
       </div>

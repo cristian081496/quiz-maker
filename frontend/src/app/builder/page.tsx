@@ -61,7 +61,7 @@ export default function QuizBuilder() {
                 ))}
               </ul>
               <div className="mt-3">
-                <Button variant="outline" size="sm" onClick={dismissValidation}>
+                <Button className="bg-red-500 text-white hover:bg-red-500/80" size="sm" onClick={dismissValidation}>
                   Dismiss
                 </Button>
               </div>

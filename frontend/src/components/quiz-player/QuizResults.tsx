@@ -11,6 +11,10 @@ interface QuizResultsProps {
   quiz: Quiz;
   result: AttemptSubmissionResult;
   answers: Record<string, string>;
+  antiCheatSummary?: {
+    tabSwitches: number;
+    pastes: number;
+  };
 }
 
 const scoreColor = (pct: number) => {
@@ -61,12 +65,23 @@ const answerColor = (status: string) => {
   return "text-gray-700";
 };
 
-export default function QuizResults({ quiz, result, answers }: QuizResultsProps) {
-  const summary = useMemo(() => buildAttemptSummary(quiz, result, answers), [
-    quiz,
-    result,
-    answers,
-  ]);
+export default function QuizResults({ quiz, result, answers, antiCheatSummary }: QuizResultsProps) {
+  const summary = useMemo(
+    () => buildAttemptSummary(quiz, result, answers),
+    [quiz, result, answers]
+  );
+
+  const antiCheatText = useMemo(() => {
+    if (!antiCheatSummary) return "";
+    const parts: string[] = [];
+    if (antiCheatSummary.tabSwitches > 0) {
+      parts.push(`${antiCheatSummary.tabSwitches} tab switches`);
+    }
+    if (antiCheatSummary.pastes > 0) {
+      parts.push(`${antiCheatSummary.pastes} pastes`);
+    }
+    return parts.join(" · ");
+  }, [antiCheatSummary]);
 
   return (
     <div className="min-h-screen bg-white py-8 px-4">
@@ -115,6 +130,12 @@ export default function QuizResults({ quiz, result, answers }: QuizResultsProps)
                   <span className="text-yellow-600">{summary.pendingReview}</span>
                 </div>
               )}
+              <div className="flex justify-between">
+                <span className="font-medium">Anti-cheat:</span>
+                <span className="text-gray-600">
+                  {antiCheatText || "None"}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>

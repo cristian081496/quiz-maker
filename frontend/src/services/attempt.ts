@@ -24,6 +24,8 @@ export const attemptService = {
 
   // Log attempt event
   logEvent: async (attemptId: string, event: AttemptEvent): Promise<void> => {
-    await apiClient.post(`/attempts/${attemptId}/events`, event);
+    await apiClient.post(`/attempts/${attemptId}/events`, {
+      event: JSON.stringify(event),
+    });
   },
 };

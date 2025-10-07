@@ -32,6 +32,8 @@ export default function QuizPlayer() {
     submitAttempt,
     isSubmittingAttempt,
     isQuestionAnswered,
+    trackPaste,
+    antiCheatSummary,
   } = useQuizAttempt({ quizId });
 
   const totalQuestions = questions.length;
@@ -95,7 +97,14 @@ export default function QuizPlayer() {
 
   // if the restult and quiz are available then show the quiz results
   if (result && quiz) {
-    return <QuizResults quiz={quiz} result={result} answers={answers} />;
+    return (
+      <QuizResults
+        quiz={quiz}
+        result={result}
+        answers={answers}
+        antiCheatSummary={antiCheatSummary}
+      />
+    );
   }
 
   if (!quiz) {
@@ -148,6 +157,7 @@ export default function QuizPlayer() {
             onAnswerChange={(answer) =>
               recordAnswer(String(currentQuestion.id), answer)
             }
+            onPaste={trackPaste}
           />
         ) : (
           <Card>

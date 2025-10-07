@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { attemptService } from "@/services/attempt";
 import { useQuiz } from "@/hooks/useQuiz";
-import { Attempt, AttemptSubmissionResult, Question } from "@/types/quiz";
+import { Attempt, AttemptEvent, AttemptSubmissionResult, Question } from "@/types/quiz";
 
 interface UseQuizAttemptOptions {
   autoStart?: boolean;
@@ -37,6 +37,12 @@ export const useQuizAttempt = ({
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [result, setResult] = useState<AttemptSubmissionResult | null>(null);
+  // Track simple anticheat counts for the session
+  const [summaryCounts, setSummaryCounts] = useState({
+    tabSwitches: 0,
+    pastes: 0,
+  });
+  const visibilityStateRef = useRef<DocumentVisibilityState | null>(null);
 
   const {
     mutate: startAttempt,
@@ -49,6 +55,7 @@ export const useQuizAttempt = ({
       setAnswers({});
       setCurrentQuestionIndex(0);
       setResult(null);
+      setSummaryCounts({ tabSwitches: 0, pastes: 0 });
     },
   });
 
@@ -107,6 +114,57 @@ export const useQuizAttempt = ({
     [submitAnswer]
   );
 
+  const attemptId = attempt?.id ? String(attempt.id) : null;
+
+  // Send anti-cheat event to backend 
+  const pushEvent = useCallback(
+    (type: AttemptEvent["type"], metadata?: Record<string, unknown>) => {
+      if (!attemptId || result) return;
+      const event: AttemptEvent = {
+        type,
+        timestamp: new Date().toISOString(),
+        metadata,
+      };
+      attemptService.logEvent(attemptId, event).catch(() => {});
+      setSummaryCounts((prev) => ({
+        tabSwitches:
+          type === "visibility_change"
+            ? prev.tabSwitches + 1
+            : prev.tabSwitches,
+        pastes: type === "paste" ? prev.pastes + 1 : prev.pastes,
+      }));
+    },
+    [attemptId, result]
+  );
+
+  const trackPaste = useCallback(
+    (questionId?: string) => {
+      pushEvent("paste", questionId ? { questionId } : undefined);
+    },
+    [pushEvent]
+  );
+
+  useEffect(() => {
+    if (!attemptId || result) return;
+
+    visibilityStateRef.current = document.visibilityState;
+
+    const handleVisibility = () => {
+      const state = document.visibilityState;
+      if (visibilityStateRef.current === state) return;
+      visibilityStateRef.current = state;
+      if (state === "hidden") {
+        pushEvent("visibility_change", { state });
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [attemptId, pushEvent, result]);
+
   const goToQuestion = useCallback((index: number) => {
     setCurrentQuestionIndex(index);
   }, []);
@@ -136,6 +194,8 @@ export const useQuizAttempt = ({
     setAnswers({});
     setCurrentQuestionIndex(0);
     setResult(null);
+    setSummaryCounts({ tabSwitches: 0, pastes: 0 });
+    visibilityStateRef.current = null;
   }, []);
 
   return {
@@ -159,5 +219,7 @@ export const useQuizAttempt = ({
     submitAttempt,
     isQuestionAnswered,
     resetAttempt,
+    trackPaste,
+    antiCheatSummary: summaryCounts,
   };
 };
