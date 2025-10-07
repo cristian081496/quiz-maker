@@ -17,7 +17,6 @@ interface UseQuizBuilderResult {
   addQuestion: () => void;
   updateQuestion: (index: number, question: Question) => void;
   removeQuestion: (index: number) => void;
-  reorderQuestions: (fromIndex: number, toIndex: number) => void;
   saveQuiz: () => Promise<void>;
   dismissValidation: () => void;
 }
@@ -111,15 +110,6 @@ export const useQuizBuilder = (): UseQuizBuilderResult => {
     });
   }, []);
 
-  const reorderQuestions = useCallback((fromIndex: number, toIndex: number) => {
-    setQuestions((prev) => {
-      const clone = [...prev];
-      const [moved] = clone.splice(fromIndex, 1);
-      clone.splice(toIndex, 0, moved);
-      return clone.map((question, position) => ({ ...question, position }));
-    });
-  }, []);
-
   const dismissValidation = useCallback(() => setValidationErrors([]), []);
 
   const saveQuiz = useCallback(async () => {
@@ -151,7 +141,6 @@ export const useQuizBuilder = (): UseQuizBuilderResult => {
       addQuestion,
       updateQuestion,
       removeQuestion,
-      reorderQuestions,
       saveQuiz,
       dismissValidation,
     }),
@@ -165,7 +154,6 @@ export const useQuizBuilder = (): UseQuizBuilderResult => {
       addQuestion,
       updateQuestion,
       removeQuestion,
-      reorderQuestions,
       saveQuiz,
       dismissValidation,
     ]

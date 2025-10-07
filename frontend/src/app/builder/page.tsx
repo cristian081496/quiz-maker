@@ -24,7 +24,6 @@ export default function QuizBuilder() {
     addQuestion,
     updateQuestion,
     removeQuestion,
-    reorderQuestions,
     saveQuiz,
     dismissValidation,
   } = useQuizBuilder();
@@ -130,7 +129,6 @@ export default function QuizBuilder() {
                     questions={questions}
                     onUpdate={updateQuestion}
                     onRemove={removeQuestion}
-                    onReorder={reorderQuestions}
                   />
                 )}
               </CardContent>
