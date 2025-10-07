@@ -87,6 +87,18 @@ export default function QuestionEditor({
           />
         </div>
 
+        {/* Optional code snippet */}
+        <div>
+          <Label>Code Snippet (optional)</Label>
+          <Textarea
+            placeholder="Paste any reference code"
+            value={question.codeSnippet ?? ""}
+            onChange={(e) => onUpdate({ ...question, codeSnippet: e.target.value })}
+            rows={4}
+            className="font-mono text-sm"
+          />
+        </div>
+
         {/* Options for MCQ */}
         {question.type === "mcq" && question.options && (
           <div>

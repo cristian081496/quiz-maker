@@ -164,6 +164,11 @@ export default function QuizResults({ quiz, result, answers, antiCheatSummary }:
                   </div>
 
                   <div className="space-y-1 text-sm">
+                    {item.question.codeSnippet && item.question.codeSnippet.trim() && (
+                      <div className="bg-gray-100 rounded p-3 font-mono text-xs whitespace-pre-wrap">
+                        {item.question.codeSnippet}
+                      </div>
+                    )}
                     <div>
                       <span className="font-medium">Your answer: </span>
                       <span className={answerColor(item.status)}>

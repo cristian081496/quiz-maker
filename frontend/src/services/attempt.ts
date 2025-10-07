@@ -1,10 +1,17 @@
 import { apiClient } from './client';
 import { Attempt, AttemptEvent, AttemptSubmissionResult } from '@/types/quiz';
+import { mapQuizFromApi } from '@/services/quiz';
 
 export const attemptService = {
   // Start a new attempt
   start: async (quizId: string): Promise<Attempt> => {
     const { data } = await apiClient.post('/attempts', { quizId });
+    if (data.quiz) {
+      return {
+        ...data,
+        quiz: mapQuizFromApi(data.quiz),
+      };
+    }
     return data;
   },
 

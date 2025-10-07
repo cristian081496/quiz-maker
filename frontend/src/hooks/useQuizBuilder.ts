@@ -28,6 +28,7 @@ const buildQuestion = (position: number): Question => ({
   options: ["", "", "", ""],
   correctAnswer: "",
   position,
+  codeSnippet: "",
 });
 
 const validateQuestions = (questions: Question[]) => {
@@ -80,6 +81,7 @@ export const useQuizBuilder = (): UseQuizBuilderResult => {
           options: question.options,
           correctAnswer: question.correctAnswer,
           position: question.position,
+          codeSnippet: question.codeSnippet,
         });
       }
 

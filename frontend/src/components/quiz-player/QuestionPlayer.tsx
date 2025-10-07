@@ -25,6 +25,16 @@ export default function QuestionPlayer({
         <p className="text-lg text-gray-900 leading-relaxed">{question.prompt}</p>
       </div>
 
+      {question.codeSnippet && question.codeSnippet.trim() && (
+        <div className="mb-6">
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 overflow-x-auto">
+            <pre className="text-sm font-mono whitespace-pre-wrap">
+              {question.codeSnippet}
+            </pre>
+          </div>
+        </div>
+      )}
+
       <div>
         {question.type === "mcq" && question.options && (
           <RadioGroup value={answer} onValueChange={onAnswerChange}>

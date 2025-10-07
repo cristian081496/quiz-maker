@@ -50,7 +50,7 @@ export default function QuizBuilder() {
         </div>
 
         {/* Error message */}
-        {validationErrors.length > 0 && (
+        {!savedQuizId && validationErrors.length > 0 && (
           <Alert variant="destructive" className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Complete the form before saving</AlertTitle>
@@ -80,73 +80,77 @@ export default function QuizBuilder() {
             </AlertDescription>
           </Alert>
         )}
+        
+        {!savedQuizId && (
+          <>
+            {/* Quiz Details */}
+            <Card className="mb-6 border border-gray-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-xl text-gray-900">Quiz Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    placeholder="Enter quiz title"
+                    value={title}
+                    onChange={(event) => setTitle(event.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Enter quiz description"
+                    value={description}
+                    onChange={(event) => setDescription(event.target.value)}
+                    rows={3}
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Quiz Details */}
-        <Card className="mb-6 border border-gray-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-xl text-gray-900">Quiz Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                placeholder="Enter quiz title"
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-              />
+            {/* Questions */}
+            <Card className="mb-6 border border-gray-200 shadow-sm">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-xl text-gray-900">Questions</CardTitle>
+                <Button onClick={addQuestion} size="sm" variant="secondary">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Question
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {questions.length === 0 ? (
+                  <p className="text-gray-600 text-center py-8">
+                    No questions added yet. Click &quot;Add Question&quot; to start.
+                  </p>
+                ) : (
+                  <QuestionList
+                    questions={questions}
+                    onUpdate={updateQuestion}
+                    onRemove={removeQuestion}
+                    onReorder={reorderQuestions}
+                  />
+                )}
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-end gap-4">
+              <Link href="/">
+                <Button variant="outline">Cancel</Button>
+              </Link>
+              <Button
+                onClick={saveQuiz}
+                disabled={isSaving || !!savedQuizId}
+                variant="default"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {isSaving ? "Saving..." : "Save Quiz"}
+              </Button>
             </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Enter quiz description"
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                rows={3}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quizzes */}
-        <Card className="mb-6 border border-gray-200 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-xl text-gray-900">Questions</CardTitle>
-            <Button onClick={addQuestion} size="sm" variant="secondary">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Question
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {questions.length === 0 ? (
-              <p className="text-gray-600 text-center py-8">
-                No questions added yet. Click &quot;Add Question&quot; to start.
-              </p>
-            ) : (
-              <QuestionList
-                questions={questions}
-                onUpdate={updateQuestion}
-                onRemove={removeQuestion}
-                onReorder={reorderQuestions}
-              />
-            )}
-          </CardContent>
-        </Card>
-
-        <div className="flex justify-end gap-4">
-          <Link href="/">
-            <Button variant="outline">Cancel</Button>
-          </Link>
-          <Button
-            onClick={saveQuiz}
-            disabled={isSaving || !!savedQuizId}
-            variant="default"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {isSaving ? "Saving..." : "Save Quiz"}
-          </Button>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
